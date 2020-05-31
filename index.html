@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Movies Library </title>
+	<style>
+		html, body {
+    padding: 0;
+    margin-top: 0pc;
+    margin-right: 0pc;
+    margin-left: 0pc;
+    margin-bottom: 0pc;
+	 font:  sans-serif ;
+    box-sizing: border-box;
+			font-family: Helvetica, Calibri, Roboto, Open Sans, sans-serif
+			-webkit-backface-visibility: hidden;
+		}
+		* {
+			box-sizing: inherit;
+		}
+		h1 {
+			text-align: center;
+			color: #323232;
+		}
+		
+		h2 {
+			text-align: center;
+			
+		}
+		
+		h4 {
+			text-align: center;
+			color: #323232;
+		}
+		
+		svg {
+			margin:auto;
+			display:block;
+			
+		}
+		
+		#header-line {
+	border: 0;
+	height: 1px;
+	color: rgb(148, 148, 148);
+	background-color: #ccc;
+	width: 1080px;
+	position: absolute;
+	top: 70px;
+	left: 200px;
+}
+
+		.circle-overlay {
+			font-size: 15px;
+			border-radius: 0%;
+			position: absolute;
+			overflow: hidden;
+			/*it's buggy with the foreignObject background right now*/
+			/*background-color: rgba(255,255,255,0.5);*/
+		}
+		.circle-overlay__inner {
+			text-align: center;
+			width: 100%;
+			height: 100%;
+		}
+		h3 {
+             text-align: center;
+			color: white;
+			
+			
+        }
+
+
+		.hidden {
+			display: none;
+		}
+		.node-icon--faded {
+			opacity: 0.5;
+		}
+		.legend-size circle {
+			fill: rgb(50, 200, 100);
+		}
+		#legend {
+	position: absolute;
+	left: 0px;
+	top: 200px;
+	z-index: 20;
+}
+		
+
+	</style>
+</head>
+<body >
+	<h1 >Movies Library</h1>
+	
+	<hr id="header-line" />
+
+<svg width="100%" height="700" align="left" font-family="sans-serif" font-size="10" text-anchor="end" ></svg>
+
+	<script src="js/d3.min.js"></script>
+	<script src="js/d3-legend.min.js"></script>
+	<script>
+		// Based loosely from this D3 bubble graph https://bl.ocks.org/mbostock/4063269
+		// And this Forced directed diagram https://bl.ocks.org/mbostock/4062045
+		let data = [{
+			cat: 'Action', name: 'Avatar', value: 78,
+			icon: 'img/avatar.jpg',
+			desc: `
+			          A paraplegic marine dispatched to the moon Pandora on a unique mission becomes torn between following his orders and protecting the world he feels is his home.
+				`
+		}, {
+			cat: 'Action', name: 'Pirates of the Caribbean', value: 71,
+			icon: 'img/j.jpg',
+			desc: `
+			    Captain Barbossa, Will Turner and Elizabeth Swann must sail off the edge of the map, navigate treachery and betrayal, find Jack Sparrow, and make their final alliances for one last decisive battle.
+			`
+		}, {
+			cat: 'Drama', name: 'Newlyweds', value: 70,
+			icon: 'img/1.jpg',
+			desc: `
+			    Newlyweds Buzzy and Katie find their blissful life disrupted by the arrival of his half-sister and news of her sister's marriage troubles.
+			`
+		}, {
+			cat: 'Animation', name: 'Rise of the Guardians', value: 73,
+			icon: 'img/i1.jpg',
+			desc: `
+			When the evil spirit Pitch launches an assault on Earth, the Immortal Guardians team up to protect the innocence of children all around the world.
+           `
+		}, {
+			cat: 'Animation', name: 'How to Train Your Dragon 2', value: 78,
+			icon: 'img/i2.jpg',
+			desc: `
+			When Hiccup and Toothless discover an ice cave that is home to hundreds of new wild dragons and the mysterious Dragon Rider, the two friends find themselves at the center of a battle to protect the peace.
+            `
+		}, {
+			cat: 'Animation', name: 'Beowulf', value: 62,
+			icon: 'img/i3.jpg',
+			desc: `
+			The warrior Beowulf must fight and defeat the monster Grendel who is terrorizing Denmark, and later, Grendel's mother, who begins killing out of revenge.
+            
+			`
+		}, {
+			cat: 'Animation', name: 'Tangled', value: 78,
+			icon: 'img/i4.jpg',
+			desc: `
+			The magically long-haired Rapunzel has spent her entire life in a tower, but now that a runaway thief has stumbled upon her, she is about to discover the world for the first time, and who she really is.
+			`
+		}, {
+			cat: 'Animation', name: 'Monsters University', value: 73,
+			icon: 'img/i5.jpg',
+			desc: `
+			A look at the relationship between Mike and Sulley during their days at Monsters University -- when they weren't necessarily the best of friends.
+             `
+		}, {
+			cat: 'Animation', name: 'Mr. Peabody & Sherman', value: 68,
+			icon: 'img/i6.jpg',
+			desc: `
+			The time-travelling adventures of an advanced canine and his adopted son, as they endeavor to fix a time rift they created.
+             `
+		},  {
+			cat: 'Animation', name: 'The Good Dinosaur ', value: 67,
+			icon: 'img/i8.jpg',
+			desc: `
+			In a world where dinosaurs and humans live side-by-side, an Apatosaurus named Arlo makes an unlikely human friend.`
+		}, {
+			cat: 'Animation', name: 'Toy Story 3', value: 83,
+			icon: 'img/i7.jpg',
+			desc: `
+			The toys are mistakenly delivered to a day-care center instead of the attic right before Andy leaves for college, and it's up to Woody to convince the other toys that they weren't abandoned and to return home.
+			`
+		}, {
+			cat: 'Animation', name: 'Brave', value: 71,
+			icon: 'img/i9.jpg',
+			desc: `
+			Determined to make her own path in life, Princess Merida defies a custom that brings chaos to her kingdom. Granted one wish, Merida must rely on her bravery and her archery skills to undo a beastly curse.`
+		}, {
+			cat: 'Animation', name: 'WALL·E', value: 84,
+			icon: 'img/i10.jpg',
+			desc: `In the distant future, a small waste-collecting robot inadvertently embarks on a space journey that will ultimately decide the fate of mankind.`
+		}, {
+			cat: 'Animation', name: 'A Christmas Carol', value: 68,
+			icon: 'img/i11.jpg',
+			desc: `
+			An animated retelling of Charles Dickens' classic novel about a Victorian-era miser taken on a journey of self-redemption, courtesy of several mysterious Christmas apparitions.`
+		},  {
+			cat: 'Animation', name: 'Flushed Away', value: 66,
+			icon: 'img/i12.jpg',
+			desc: `
+			The story of an uptown rat that gets flushed down the toilet from his penthouse apartment, ending in the sewers of London, where he has to learn a whole new and different way of life. `
+		}, {
+			cat: 'Animation', name: 'Monsters vs. Aliens', value: 65,
+			icon: 'img/i13.jpg',
+			desc: `
+			A woman transformed into a giant after she is struck by a meteorite on her wedding day becomes part of a team of monsters sent in by the U.S. government to defeat an alien mastermind trying to take over Earth.
+			`
+		}, {
+			cat: 'Animation', name: 'Inside Out', value: 82,
+			icon: 'img/i14.jpg',
+			desc: `
+			After young Riley is uprooted from her Midwest life and moved to San Francisco, her emotions - Joy, Fear, Anger, Disgust and Sadness - conflict on how best to navigate a new city, house, and school.`
+		}, {
+			cat: 'Animation', name: 'Shrek Forever After', value: 63,
+			icon: 'img/i15.jpg',
+			desc: `
+			Rumpelstiltskin tricks a mid-life crisis burdened Shrek into allowing himself to be erased from existence and cast in a dark alternate timeline where Rumpel rules supreme.`
+		}, {
+			cat: 'Animation', name: 'Wreck-It Ralph', value: 77,
+			icon: 'img/i17.jpg',
+			desc: `
+			A video game villain wants to be a hero and sets out to fulfill his dream, but his quest brings havoc to the whole arcade where he lives.`
+		}, {
+			cat: 'Animation', name: 'The Polar Express', value: 66,
+			icon: 'img/i16.jpg',
+			desc: `
+			On Christmas Eve, a young boy embarks on a magical adventure to the North Pole on the Polar Express, while learning about friendship, bravery, and the spirit of Christmas.`
+		}, {
+			cat: 'Animation', name: 'How to Train Your Dragon', value: 81,
+			icon: 'img/i18.jpg',
+			desc: `
+			A hapless young Viking who aspires to hunt dragons becomes the unlikely friend of a young dragon himself, and learns there may be more to the creatures than he assumed.
+			`
+		}, {
+			cat: 'Animation', name: 'Shrek the Third', value: 61,
+			icon: 'img/i19.jpg',
+			desc: `
+			When his new father-in-law, King Harold falls ill, Shrek is looked at as the heir to the land of Far, Far Away. Not one to give up his beloved swamp, Shrek recruits his friends Donkey and Puss in Boots to install the rebellious Artie as the new king. Princess Fiona, however, rallies a band of royal girlfriends to fend off a coup d'etat by the jilted Prince Charming.
+
+			`
+		}, {
+			cat: 'Animation', name: 'Ratatouille', value: 80,
+			icon: 'img/i20.jpg',
+			desc: `
+			A rat who can cook makes an unusual alliance with a young kitchen worker at a famous restaurant.
+`
+		}, {
+			cat: 'Animation', name: 'Madagascar: Escape 2 Africa', value: 67,
+			icon: 'img/i21.jpg',
+			desc: `
+			The Madagascar animals fly back to New York City, but crash-land on an African nature reserve, where they meet others of their own kind, and Alex especially discovers his royal heritage as prince of a lion pride.
+`
+		}, {
+			cat: 'Animation', name: 'Frozen', value: 75,
+			icon: 'img/i22.jpg',
+			desc: `
+			When the newly-crowned Queen Elsa accidentally uses her power to turn things into ice to curse her home in infinite winter, her sister Anna teams up with a mountain man, his playful reindeer, and a snowman to change the weather condition.
+
+			`
+		}, {
+			cat: 'Animation', name: 'Bolt', value: 69,
+			icon: 'img/i23.jpg',
+			desc: `
+			The canine star of a fictional sci-fi/action show that believes his powers are real embarks on a cross country trek to save his co-star from a threat he believes is just as real.
+
+			`
+		}, {
+			cat: 'Animation', name: 'G-Force', value: 51,
+			icon: 'img/i24.jpg',
+			desc: `
+			A specially trained squad of guinea pigs is dispatched to stop a diabolical billionaire from taking over the world.
+
+			`
+		}, {
+			cat: 'Animation', name: 'Bee Movie ', value: 61,
+			icon: 'img/i25.jpg',
+			desc: `
+			Barry B. Benson, a bee just graduated from college, is disillusioned at his lone career choice: making honey. On a special trip outside the hive, Barry's life is saved by Vanessa, a florist in New York City. As their relationship blossoms, he discovers humans actually eat honey, and subsequently decides to sue them.
+`
+		}, {
+			cat: 'Action', name: 'Spectre', value: 60,
+			icon: 'img/Spectre.jpg',
+			desc: `
+				A cryptic message from 007's past sends him pitted against a mysterious terrorist organization called Spectre, and learns of its involvement in previous events of his most dangerous missions.
+				
+			`
+		}, {
+			cat: 'Action', name: 'The Dark Knight Rises', value: 80,
+			icon: 'img/The Dark Knight Rises.jpg',
+			desc: `
+				Eight years after the Joker's reign of anarchy, Batman, with the help of the enigmatic Catwoman, is forced from his exile to save Gotham City, now on the edge of total annihilation, from the brutal guerrilla terrorist Bane.
+`
+		}, {
+			cat: 'Action', name: 'X-Men: The Last Stand', value: 60,
+			icon: 'img/X-man.jpg',
+			desc: `
+				The human government develops a cure for mutations, and Jean Gray becomes a darker uncontrollable persona called the Phoenix who allies with Magneto, causing escalation into an all-out battle for the X-Men.
+		
+			`
+		}, {
+			cat: 'Action', name: 'John Carter', value: 60,
+			icon: 'img/John Carter.jpg',
+			desc: `
+				Transported to Barsoom, a Civil War vet discovers a barren planet seemingly inhabited by 12-foot tall barbarians. Finding himself prisoner of these creatures, he escapes, only to encounter Woola and a princess in desperate need of a savior.
+				
+			`
+		}, {
+			cat: 'Action', name: 'Spider-Man 3', value: 60,
+			icon: 'img/Spider-Man 3.jpg',
+			desc: `
+				A strange black entity from another world bonds with Peter Parker and causes inner turmoil as he contends with new villains, temptations, and revenge.
+				
+			`
+		}, {
+			cat: 'Action', name: 'Skyfall', value: 70,
+			icon: 'img/Skyfall.jpg',
+			desc: `
+				Bond's loyalty to M is tested when her past comes back to haunt her. When MI6 comes under attack, 007 must track down and destroy the threat, no matter how personal the cost.
+				
+			`
+		}, {
+			cat: 'Action', name: 'Avengers: Age of Ultron', value: 50,
+			icon: 'img/Avenger.jpg',
+			desc: `
+							When Tony Stark and Bruce Banner try to jump-start a dormant peacekeeping program called Ultron, things go horribly wrong and it's up to Earth's mightiest heroes to stop the villainous Ultron from enacting his terrible plan.
+							
+			`
+		},{
+			cat: 'Action', name: 'Jurassic World', value: 50,
+			icon: 'img/Jurassic World.jpg',
+			desc: `
+				A new theme park, built on the original site of Jurassic Park, creates a genetically modified hybrid dinosaur, the Indominus Rex, which escapes containment and goes on a killing spree.
+				
+			`
+		}, {
+			cat: 'Action', name: 'Batman v Superman: Dawn of Justice', value: 50,
+			icon: 'img/BS.jpg',
+			desc: `
+				Fearing that the actions of Superman are left unchecked, Batman takes on the Man of Steel, while the world wrestles with what kind of a hero it really needs.
+				
+			`
+		}, {
+			cat: 'Action', name: 'Superman Returns', value: 40,
+			icon: 'img/Superman Returns.jpg',
+			desc: `
+				Superman returns to Earth after spending five years in space examining his homeworld Krypton. But he finds things have changed while he was gone, and he must once again prove himself important to the world.
+				
+			`
+		},{
+			cat: 'Action', name: 'Quantum of Solace', value: 30,
+			icon: 'img/Quantum of Solace.jpg',
+			desc: `
+				James Bond descends into mystery as he tries to stop a mysterious organization from eliminating a country's most valuable resource.
+							
+			`
+		},{
+			cat: 'Action', name: 'Pirates of the Caribbean: Dead Mans Chest', value: 50,
+			icon: 'img/P.jpg',
+			desc: `
+				Jack Sparrow races to recover the heart of Davy Jones to avoid enslaving his soul to Jones' service, as other friends and foes seek the heart for their own agenda as well.
+				
+			`
+		}, {
+			cat: 'Action', name: 'The Lone Ranger', value: 40,
+			icon: 'img/Ranger.jpg',
+			desc: `
+				Native American warrior Tonto recounts the untold tales that transformed John Reid, a man of the law, into a legend of justice.
+				
+			`
+		}, {
+			cat: 'Action', name: 'Man of Steel', value: 30,
+			icon: 'img/Man of Steel.jpg',
+			desc: `
+				Clark Kent is an alien who as a child was evacuated from his dying world and came to Earth, living as a normal human. But when survivors of his alien home invade Earth, he must reveal himself to the world.
+			
+			`
+		},{
+			cat: 'Action', name: 'The Chronicles of Narnia: Prince Caspian', value: 60,
+			icon: 'img/The Chronicles of Narnia Prince Caspian.jpg',
+			desc: `
+				The Pevensie siblings return to Narnia, where they are enlisted to once again help ward off an evil king and restore the rightful heir to the land's throne, Prince Caspian.
+				
+			`
+		}, {
+			cat: 'Action', name: 'Avengers Assemble', value: 70,
+			icon: 'img/Avengers Assemble.jpg',
+			desc: `
+				Earth's mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity.
+					`
+		}, {
+			cat: 'Action', name: 'Pirates of the Caribbean: On Stranger Tides', value: 60,
+			icon: 'img/Pirates of the Caribbean On Stranger Tides.jpg',
+			desc: `
+				Jack Sparrow and Barbossa embark on a quest to find the elusive fountain of youth, only to discover that Blackbeard and his daughter are after it too.
+				`
+		}, {
+			cat: 'Action', name: 'Men in Black 3', value: 60,
+			icon: 'img/Men in Black 3.jpg',
+			desc: `
+				Agent J travels in time to M.I.B.'s early days in 1969 to stop an alien from assassinating his friend Agent K and changing history.
+					`
+		}, {
+			cat: 'Action', name: 'King Kong', value: 65,
+			icon: 'img/King Kong.jpg',
+			desc: `
+				In 1933 New York, an overly ambitious movie producer coerces his cast and hired ship crew to travel to the mysterious Skull Island, where they encounter Kong, a giant ape who is immediately smitten with leading lady Ann Darrow.
+					`
+		}, {
+			cat: 'Action', name: 'The Amazing Spider-Man', value: 50,
+			icon: 'img/The Amazing.jpg',
+			desc: `
+				After Peter Parker is bitten by a genetically altered spider, he gains newfound, spider-like powers and ventures out to solve the mystery of his parent's mysterious death.
+				`
+		}, {
+			cat: 'Action', name: 'Robin Hood', value: 40,
+			icon: 'img/Robin Hood.jpg',
+			desc: `
+				In 12th century England, Robin and his band of marauders confront corruption in a local village and lead an uprising against the crown that will forever alter the balance of world power.
+			`
+		}, {
+			cat: 'Action', name: 'Captain America: Civil War', value: 60,
+			icon: 'img/Captain America Civil War.jpg',
+			desc: `
+				Political involvement in the Avengers' affairs causes a rift between Captain America and Iron Man.
+				`
+		}, {
+			cat: 'Action', name: 'Battleship', value: 60,
+			icon: 'img/Battleship.jpg',
+			desc: `
+				A fleet of ships is forced to do battle with an armada of unknown origins in order to discover and thwart their destructive goals.
+					`
+		}, {
+			cat: 'Drama', name: 'Titanic', value: 78,
+			icon: 'img/m1.jpg',
+			desc: `
+				A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic
+			`
+		}, {
+			cat: 'Drama', name: 'Bang', value: 64,
+			icon: 'img/m2.jpg',
+			desc: `
+				A young woman in L.A. is having a bad day: she's evicted, an audition ends with a producer furious she won't trade sex for the part,
+				and a policeman nabs her for something she didn't do
+			`
+		}, {
+			cat: 'Drama', name: 'Primer', value: 69,
+			icon: 'img/m3.jpg',
+			desc: `
+		Four friends/fledgling entrepreneurs, knowing that there's something bigger and more innovative than the different error-checking devices they've built,
+		wrestle over their new invention.
+			`
+		}, {
+			cat: 'Drama', name: 'The Mongol King', value: 76,
+			icon: 'img/m4.jpg',
+			desc: `
+		While writing a term paper a woman gets involved in a mysterious unsolved case which leads her and her professor into the darkness of his past.`
+	    }, {
+		cat: 'Drama', name: 'Signed Sealed Delivered ', value: 77,
+        icon: 'img/m6.jpg',
+        desc: `A two-hour backdoor pilot of the TV series with the same name that focuses on four postal workers who take it upon themselves to track down intended recipients of undeliverable mail.`
+		}, {
+           cat: 'Drama', name: 'Shanghai Calling ', value: 63,
+           icon: 'img/m7.jpg',
+           desc: `A New York attorney is sent to Shanghai on business, where he finds himself in a legal mess that threatens his career.
+           With the help of a relocation specialist and her contacts, he soon learns to appreciate the wonders of Shanghai.`
+       },  {
+           cat: 'Drama', name: 'Manito ', value: 69,
+           icon: 'img/m8.jpg',
+           desc: `Fifteen years ago, their Washington Heights neighborhood was dubbed the crack-cocaine capital of the world, but today it is transforming into one of the most vibrant, Spanish-speaking`
+       },  {
+           cat: 'Drama', name: 'Slacker ', value: 71,
+           icon: 'img/m9.jpg',
+           desc: `A day in the life of Austin, Texas as the camera roams from place to place and provides a brief look at the overeducated, the social misfits, the outcasts and the oddballs.`
+       }, {
+
+		cat: 'Drama', name: 'Dutch Kills', value: 51,
+			icon: 'img/m10.jpg',
+			desc: `
+		A desperate ex-con is forced to gather his old crew for one last job to pay off his sister's debt to a dangerous local criminal.`
+		}, {
+			cat: 'Drama', name: 'Flywheel', value: 69,
+			icon: 'img/m11.jpg',
+			desc: `
+		A dishonest used car salesman decides to become the salesman that God wants him to be - with surprising results.`
+		}, {
+			cat: 'Drama', name: 'The Puffy Chair', value: 65,
+			icon: 'img/m12.jpg',
+			desc: `
+		Josh Sagers drives cross-country on a mission to deliver his father's birthday gift - a giant purple LazyBoy.`
+		},{
+			cat: 'Drama', name: 'Clean', value: 69,
+			icon: 'img/m13.jpg',
+			desc: `
+		After she ends up in prison and loses custody of her son, a woman struggles to assimilate outside her former life and remain clean long enough to regain custody of her son.`
+		},{
+			cat: 'Drama', name: 'The Circle', value: 75,
+			icon: 'img/m14.jpg',
+			desc: `
+		Various women struggle to function in the oppressively sexist society of contemporary Iran.`
+
+		}, {
+			cat: 'Drama', name: 'On the Downlow', value: 60,
+			icon: 'img/m15.jpg',
+			desc: `
+		Isaac and Angel are two young Latinos involved in a south side Chicago gang. They have a secret in a world where secrets are forbidden.`
+
+		},{
+			cat: 'Drama', name: 'Dawn of the Crescent Moon ', value: 51,
+			icon: 'img/m16.jpg',
+			desc: `
+		A group of college students travel to a small Texas town to research the Legend of Blood Lake, an obscure folktale forged by events surrounding the horrible massacre of a Comanche village.`
+
+		},{
+			cat: 'Drama', name: 'Funny Ha Ha', value: 64,
+			icon: 'img/m17.jpg',
+			desc: `
+		Marnie just graduated from college, drinks likes she's still in school,
+		and is looking for a temporary job but a permanent boyfriend. She loves a guy who doesn't love her (?), ping-pongs`
+
+		},{
+			cat: 'Drama', name: 'The Brothers McMullen', value: 66,
+			icon: 'img/m18.jpg',
+			desc:` 
+			Three Irish Catholic brothers from Long Island struggle to deal with love, marriage, and infidelity`
+		}, {
+			cat: 'Drama', name: 'This Is Martin Bonner', value: 66,
+			icon: 'img/m19.jpg',
+			desc: `
+			Martin Bonner has just moved to Nevada from the East Coast, leaving behind his two adult children and a life he spent more than two decades building.`
+		}, {
+			cat: 'Drama', name: 'George Washington ', value: 74,
+			icon: 'img/m20.jpg',
+			desc: `
+			A group of children, in a depressed small town, band together to cover up a tragic mistake one summer.`
+		},{
+			cat: 'Drama', name: 'In the Company of Men ', value: 72,
+			icon: 'img/m21.jpg',
+			desc: `
+			Two business executives--one an avowed misogynist, the other recently emotionally wounded by his love interest--set out to exact revenge on the female gender by seeking out the most innocent,
+			uncorrupted girl they can find and ruining her life.`
+		},{
+			cat: 'Drama', name: 'The Exploding Girl ', value: 63,
+			icon: 'img/m22.jpg',
+			desc:`
+			On a summer break from college, a young epileptic woman struggles to balance her feelings for her fledgling boyfriend while her friend Al crashes with her for the season`
+		},{
+			cat: 'Drama', name: 'Down Terrace', value: 65,
+			icon: 'img/m23.jpg',
+			desc: `
+			A crime family looks to unmask the police informant in their midst who threatens to take down their business.`
+		}, {
+			cat: 'Drama', name: 'The Dirties', value: 68,
+			icon: 'img/m24.jpg',
+			desc: `
+			Two best friends are filming a comedy about getting revenge on the bullies at their high school. One of them isn't joking.`
+		}, {
+			cat: 'Drama', name: 'The Odd Life of Timothy Green', value: 66,
+			icon: 'img/m25.jpg',
+			desc: `
+			A childless couple bury a box in their backyard, containing all of their wishes for an infant. Soon, a child is born, though Timothy Green is not all that he appears.
+Director: Peter Hedges
+Writers: Peter Hedges (screenplay), Ahmet Zappa (story)
+Stars: Jennifer Garner, Joel Edgerton, CJ Adams
+			`
+		}, {
+			cat: 'Horror', name: 'The mommy', value: 52,
+			icon: 'img/the_mommy.jpg',
+			desc: `
+				In the Far East, Alex O'Connell, the son of famed mummy fighters Rick and Evy O'Connell, unearths the mummy of the first Emperor of Qin -- a shape-shifting entity cursed by a witch centuries ago.
+			`
+		}, {
+			cat: 'Horror', name: 'I am legend', value: 72,
+			icon: 'img/iamlegend.jpg',
+			desc: `
+	Years after a plague kills most of humanity and transforms the rest into monsters, the sole survivor in New York City struggles valiantly to find a cure.
+			`
+		} , {
+			cat: 'Horror', name: 'End of Days', value: 57,
+			icon: 'img/Endofdays.jpg',
+			desc: `At the end of the century, Satan visits New York in search of a bride. It's up to an ex-cop who now runs an elite security outfit to stop him.
+	
+			`
+		} , {
+			cat: 'Horror', name: 'What Lies Beneath', value: 66,
+			icon: 'img/WhatLiesBeneath.jpg',
+			desc: `
+	The wife of a university research scientist believes that her lakeside Vermont home is haunted by a ghost - or that she is losing her mind.
+			`
+		}, {
+			cat: 'Horror', name: 'Hollow Man', value: 57,
+			icon: 'img/HollowMan.jpg',
+			desc: `
+	When the leader of a team of scientists volunteers to be the test subject for their experiment in human invisibility, he slowly unravels and turns against them, with horrific consequences.
+			`
+		}, {
+			cat: 'Horror', name: 'The Haunted Mansion', value: 50,
+			icon: 'img/TheHauntedMansion.jpg',
+			desc: `
+	A realtor and his wife and children are summoned to a mansion, which they soon discover is haunted, and while they attempt to escape, he learns an important lesson about the family he has neglected.
+			`
+		}, {
+			cat: 'Horror', name: 'Hannibal', value: 85,
+			icon: 'img/Hannibal.jpg',
+			desc: `
+	Explores the early relationship between the renowned psychiatrist and his patient, a young FBI criminal profiler, who is haunted by his ability to empathize with serial killers.
+			`
+		},	{
+			cat: 'Horror', name: 'Creepshow', value: 69,
+			icon: 'img/Creepshow.jpg',
+			desc: `
+	An anthology which tells five terrifying tales based on the E.C. horror comic books of the 1950s.
+			`
+		}, {
+			cat: 'Horror', name: 'Hellboy II: The Golden Army', value: 70,
+			icon: 'img/Hellboy I TheGoldenArmy.jpg',
+			desc: `
+	The mythical world starts a rebellion against humanity in order to rule the Earth, so Hellboy and his team must save the world from the rebellious creatures.
+			`
+		} , {
+			cat: 'Horror', name: 'The Haunting', value: 49,
+			icon: 'img/TheHaunting.jpg',
+			desc: `
+	When Eleanor, Theo, and Luke decide to take part in a sleep study at a huge mansion they get more than they bargained for when Dr. Marrow tells them of the house's ghostly past.
+			`
+		} ,{
+			cat: 'Horror', name: 'Evolution', value: 60,
+			icon: 'img/Evolution.jpg',
+			desc: `
+	The only residents of young Nicholas' sea-side town are women and boys. When he sees a corpse in the ocean one day, he begins to question his existence and surroundings. Why must he, and all the other boys, be hospitalised?
+			`
+		}, {
+			cat: 'Horror', name: 'A Sound of Thunder', value: 42,
+			icon: 'img/ASoundofThunder.jpg',
+			desc: `
+	When a scientist sent back to the prehistoric era strays off the path he causes a chain of events that alters history in disastrous ways.
+			`
+		} ,{
+			cat: 'Horror', name: 'Exorcist: The Beginning', value: 51,
+			icon: 'img/ExorcistTheBeginning.jpg',
+			desc: `
+	Years before Father Lankester Merrin helped save Regan MacNeil's soul, he first encounters the demon Pazuzu in East Africa. This is the tale of Father Merrin's initial battle with Pazuzu and the rediscovery of his faith.
+			`
+		} ,{
+			cat: 'Horror', name: 'Constantine', value: 76,
+			icon: 'img/Constantine.jpg',
+			desc: `
+	A man struggling with his faith who is haunted by the sins of his past is suddenly thrust into the role of defending humanity from the gathering forces of darkness.
+			`
+		} ,{
+			cat: 'Horror', name: 'Carriers', value: 60,
+			icon: 'img/Carriers.jpg',
+			desc: `
+	Four friends fleeing a viral pandemic soon learn they are more dangerous than any virus.
+			`
+		} , {
+			cat: 'Horror', name: 'AVP: Alien vs. Predator', value: 56,
+			icon: 'img/AVPAlienvsPredator.jpg',
+			desc: `
+	During an archaeological expedition on Bouvetya Island in Antarctica, a team of archaeologists and other scientists find themselves caught up in a battle between the two legends. Soon, the team realize that only one species can win.
+			`
+		} ,{
+			cat: 'Horror', name: 'Wolf', value: 62,
+			icon: 'img/Wolf.jpg',
+			desc: `
+	Publisher Will Randall becomes a werewolf and has to fight to keep his job.
+			`
+		} ,{
+			cat: 'Horror', name: 'Dracula Untold', value: 63,
+			icon: 'img/DraculaUntold.jpg',
+			desc: `
+	As his kingdom is being threatened by the Turks, young prince Vlad Tepes must become a monster feared by his own people in order to obtain the power needed to protect his own family, and the families of his kingdom.
+			`
+		} ,{
+			cat: 'Horror', name: 'ShinGodzilla', value: 67,
+			icon: 'img/ShinGodzilla.jpg',
+			desc: `Japan is plunged into chaos upon the appearance of a giant monster.
+			Directors: Hideaki Anno, Shinji Higuchi (co-director)
+			Writers: Hideaki Anno, Sean Whitley (english version)
+			`
+		},{
+			cat: 'Horror', name: 'Doom', value: 52,
+			icon: 'img/Doom.jpg',
+			desc: `
+	Space Marines are sent to investigate strange events at a research facility on Mars but find themselves at the mercy of genetically enhanced killing machines.
+			`
+		} , {
+			cat: 'Horror', name: 'World War Z', value: 70,
+			icon: 'img/WorldWarZ.jpg',
+			desc: `
+	Former United Nations employee Gerry Lane traverses the world in a race against time to stop the Zombie pandemic that is toppling armies and governments, and threatening to destroy humanity itself.
+			`
+		} ,{
+			cat: 'Horror', name: 'Abraham Lincoln: Vampire Hunter', value: 59,
+			icon: 'img/AbrahamLincolnVampireHunter.jpg',
+			desc: `
+	Abraham Lincoln, the 16th President of the United States, discovers vampires are planning to take over the United States. He makes it his mission to eliminate them.
+			`
+		} ,{
+			cat: 'Horror', name: 'Dreamcatcher', value: 55,
+			icon: 'img/Dreamcatcher.jpg',
+			desc: `
+	Friends on a camping trip discover that the town they're vacationing in is being plagued in an unusual fashion by parasitic aliens from outer space.
+			`
+		} , {
+			cat: 'Horror', name: 'Blade: Trinity', value: 59,
+			icon: 'img/BladeTrinity.jpg',
+			desc: `
+	Blade, now a wanted man by the FBI, must join forces with the Nightstalkers to face his most challenging enemy yet: Dracula.
+			`
+		} ,{
+			cat: 'Horror', name: 'The eye', value: 59,
+			icon: 'img/theeye.jpg',
+			desc: `
+	A woman receives an eye transplant that allows her to see into the supernatural world.
+			`
+		}];
+	</script>
+
+	<script>
+		let svg = d3.select('svg');
+		let width = document.body.clientWidth; // get width in pixels
+		let height = +svg.attr('height');
+		let centerX = width * 0.5;
+		let centerY = height * 0.5;
+		let strength = 0.05;
+		let focusedNode;
+
+		let format = d3.format(',d');
+
+		let scaleColor = d3.scaleOrdinal()
+        .range(['#386cb0','#478043','#faac62','#b81b34','#db4551'])
+        
+
+		// use pack to calculate radius of the circle
+		let pack = d3.pack()
+			.size([width , height ])
+			.padding(1.5);
+
+		let forceCollide = d3.forceCollide(d => d.r + 1);
+
+		// use the force
+		let simulation = d3.forceSimulation()
+			// .force('link', d3.forceLink().id(d => d.id))
+			.force('charge', d3.forceManyBody())
+			.force('collide', forceCollide)
+			// .force('center', d3.forceCenter(centerX, centerY))
+			.force('x', d3.forceX(centerX ).strength(strength))
+			.force('y', d3.forceY(centerY ).strength(strength));
+
+		// reduce number of circles on mobile screen due to slow computation
+		if ('matchMedia' in window && window.matchMedia('(max-device-width: 767px)').matches) {
+			data = data.filter(el => {
+				return el.value >= 50;
+			});
+		}
+
+		let root = d3.hierarchy({ children: data })
+			.sum(d => d.value);
+
+		// we use pack() to automatically calculate radius conveniently only
+		// and get only the leaves
+		let nodes = pack(root).leaves().map(node => {
+			console.log('node:', node.x, (node.x - centerX) * 2);
+			const data = node.data;
+			return {
+				x: centerX + (node.x - centerX) * 3, // magnify start position to have transition to center movement
+				y: centerY + (node.y - centerY) * 3,
+				r: 0, // for tweening
+				radius: node.r, //original radius
+				id: data.cat + '.' + (data.name.replace(/\s/g, '-')),
+				cat: data.cat,
+				name: data.name,
+				value: data.value,
+				icon: data.icon,
+				desc: data.desc,
+			}
+		});
+		simulation.nodes(nodes).on('tick', ticked);
+
+		svg.style('background-color', '#eee');
+		let node = svg.selectAll('.node')
+			.data(nodes)
+			.enter().append('g')
+			.attr('class', 'node')
+			.call(d3.drag()
+				.on('start', (d) => {
+					if (!d3.event.active) simulation.alphaTarget(0.2).restart();
+					d.fx = d.x;
+					d.fy = d.y;
+				})
+				.on('drag', (d) => {
+					d.fx = d3.event.x;
+					d.fy = d3.event.y;
+				})
+				.on('end', (d) => {
+					if (!d3.event.active) simulation.alphaTarget(0);
+					d.fx = null;
+					d.fy = null;
+				}));
+
+		node.append('circle')
+			.attr('id', d => d.id)
+			.attr('r', 0)
+			.style('fill', d => scaleColor(d.cat))
+			.transition().duration(2000).ease(d3.easeElasticOut)
+				.tween('circleIn', (d) => {
+					let i = d3.interpolateNumber(0, d.radius);
+					return (t) => {
+						d.r = i(t);
+						simulation.force('collide', forceCollide);
+					}
+				})
+
+		node.append('clipPath')
+			.attr('id', d => `clip-${d.id}`)
+			.append('use')
+			.attr('xlink:href', d => `#${d.id}`);
+
+		// display text as circle icon
+		node.filter(d => !String(d.icon).includes('img/'))
+			.append('text')
+			.classed('node-icon', true)
+			.attr('clip-path', d => `url(#clip-${d.id})`)
+			.selectAll('tspan')
+			.data(d => d.icon.split(';'))
+			.enter()
+				.append('tspan')
+				.attr('x', 0)
+				.attr('y', (d, i, nodes) => (13 + (i - nodes.length / 2 - 0.5) * 10))
+				.text(name => name);
+
+		// display image as circle icon
+		node.filter(d => String(d.icon).includes('img/'))
+			.append('image')
+			.classed('node-icon', true)
+			.attr('clip-path', d => `url(#clip-${d.id})`)
+			.attr('xlink:href', d => d.icon)
+			.attr('x', d => - d.radius * 0.7)
+			.attr('y', d => - d.radius * 0.7)
+			.attr('height', d => d.radius * 2 * 0.7)
+			.attr('width', d => d.radius * 2 * 0.7)
+
+		node.append('title')
+			.text(d => (d.cat + '::' + d.name + '\n' + format(d.value)));
+
+		let legendOrdinal = d3.legendColor()
+			.scale(scaleColor)
+			.shape('circle');
+
+		let legend = svg.append('g')
+			.classed('legend-color', true)
+			.attr('text-anchor', 'start')
+			.attr('transform','translate(20,30)')
+			.style('font-size','12px')
+			.call(legendOrdinal);
+
+		let sizeScale = d3.scaleOrdinal()
+  			.domain(['Less Rated', 'Top Rated'])
+  			.range([5, 10] );
+
+		let legendSize = d3.legendSize()
+			.scale(sizeScale)
+			.shape('circle')
+			.shapePadding(10)
+			.labelAlign('end');
+
+		let legend2 = svg.append('g')
+			.classed('legend-size', true)
+			.attr('text-anchor', 'start')
+			.attr('transform', 'translate(150, 25)')
+			.style('font-size', '12px')
+			.call(legendSize);
+
+
+		/*
+		<foreignObject class="circle-overlay" x="10" y="10" width="100" height="150">
+			<div class="circle-overlay__inner">
+				<h2 class="circle-overlay__title">ReactJS</h2>
+				<p class="circle-overlay__body">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam, sunt, aspernatur. Autem repudiandae, laboriosam. Nulla quidem nihil aperiam dolorem repellendus pariatur, quaerat sed eligendi inventore ipsa natus fugiat soluta doloremque!</p>
+			</div>
+		</foreignObject>
+		*/
+		let infoBox = node.append('foreignObject')
+			.classed('circle-overlay hidden', true)
+			.attr('x', -350 * 0.5 * 0.8)
+			.attr('y', -350 * 0.5 * 0.8)
+			.attr('height', 350 * 0.8)
+			.attr('width', 350 * 0.8)
+				.append('xhtml:div')
+				.classed('circle-overlay__inner', true);
+
+		infoBox.append('h2')
+			.classed('circle-overlay__title', true)
+			.text(d => d.name);
+
+		infoBox.append('p')
+			.classed('circle-overlay__body', true)
+			.html(d => d.desc);
+
+
+		node.on('click', (currentNode) => {
+			d3.event.stopPropagation();
+			console.log('currentNode', currentNode);
+			let currentTarget = d3.event.currentTarget; // the <g> el
+
+			if (currentNode === focusedNode) {
+				// no focusedNode or same focused node is clicked
+				return;
+			}
+			let lastNode = focusedNode;
+			focusedNode = currentNode;
+
+			simulation.alphaTarget(0.2).restart();
+			// hide all circle-overlay
+			d3.selectAll('.circle-overlay').classed('hidden', true);
+			d3.selectAll('.node-icon').classed('node-icon--faded', false);
+
+			// don't fix last node to center anymore
+			if (lastNode) {
+				lastNode.fx = null;
+				lastNode.fy = null;
+				node.filter((d, i) => i === lastNode.index)
+					.transition().duration(2000).ease(d3.easePolyOut)
+					.tween('circleOut', () => {
+						let irl = d3.interpolateNumber(lastNode.r, lastNode.radius);
+						return (t) => {
+							lastNode.r = irl(t);
+						}
+					})
+					.on('interrupt', () => {
+						lastNode.r = lastNode.radius;
+					});
+			}
+
+			// if (!d3.event.active) simulation.alphaTarget(0.5).restart();
+
+			d3.transition().duration(2000).ease(d3.easePolyOut)
+				.tween('moveIn', () => {
+					console.log('tweenMoveIn', currentNode);
+					let ix = d3.interpolateNumber(currentNode.x, centerX);
+					let iy = d3.interpolateNumber(currentNode.y, centerY);
+					let ir = d3.interpolateNumber(currentNode.r, centerY * 0.5);
+					return function (t) {
+						// console.log('i', ix(t), iy(t));
+						currentNode.fx = ix(t);
+						currentNode.fy = iy(t);
+						currentNode.r = ir(t);
+						simulation.force('collide', forceCollide);
+					};
+				})
+				.on('end', () => {
+					simulation.alphaTarget(0);
+					let $currentGroup = d3.select(currentTarget);
+					$currentGroup.select('.circle-overlay')
+						.classed('hidden', false);
+					$currentGroup.select('.node-icon')
+						.classed('node-icon--faded', true);
+
+				})
+				.on('interrupt', () => {
+					console.log('move interrupt', currentNode);
+					currentNode.fx = null;
+					currentNode.fy = null;
+					simulation.alphaTarget(0);
+				});
+
+		});
+
+		// blur
+		d3.select(document).on('click', () => {
+			let target = d3.event.target;
+			// check if click on document but not on the circle overlay
+			if (!target.closest('#circle-overlay') && focusedNode) {
+				focusedNode.fx = null;
+				focusedNode.fy = null;
+				simulation.alphaTarget(0.2).restart();
+				d3.transition().duration(2000).ease(d3.easePolyOut)
+					.tween('moveOut', function () {
+						console.log('tweenMoveOut', focusedNode);
+						let ir = d3.interpolateNumber(focusedNode.r, focusedNode.radius);
+						return function (t) {
+							focusedNode.r = ir(t);
+							simulation.force('collide', forceCollide);
+						};
+					})
+					.on('end', () => {
+						focusedNode = null;
+						simulation.alphaTarget(0);
+					})
+					.on('interrupt', () => {
+						simulation.alphaTarget(0);
+					});
+
+				// hide all circle-overlay
+				d3.selectAll('.circle-overlay').classed('hidden', true);
+				d3.selectAll('.node-icon').classed('node-icon--faded', false);
+			}
+		});
+
+		function ticked() {
+			node
+				.attr('transform', d => `translate(${d.x},${d.y})`)
+				.select('circle')
+					.attr('r', d => d.r);
+		}
+	</script>
+<div><footer><div>
+		<h2 style="margin-bottom: 0px; padding-bottom: 0px; padding-top: 0px; color: #323232; "> Bubbles Description </h2>
+		
+   <h4 style="margin-bottom: 0px; padding-bottom: 0px; padding-top: 0px;">
+	   Nowadays, there are enormous number of produced movies all over the world.<br>
+		This visualization represents four types of the known movie genres in different colourful bubbles.<br>
+		The genres are as follow: action, animation, horror and drama.<br>
+		Action genre is represented by blue bubble, Animation genre is represented by yellow bubble, Horror genre is represented by red genre bubble, Drama genre is represented by purple bubble. <br>
+		<br>
+		If the curser moves over a bubble a brief information of the movie appear which are movie genre, name and rating.<br>
+		If the rating was high, the bubble appears larger and vice versa.in addition, if the user clicks on specific bubble,the bubble comes larger containing the movie description.<br>
+		<br>
+		Beside the visualization there are the explanation of bubbles colours and the size.
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	</h4>
+  </div></footer></div>	
+ <footer id="footer">
+        <div class="container" style="background-color:#323232" align="justify">
+            <br>
+                   <h3> Manal Alzeer - Haneen Alhagbany - Shahad Abahussain - Monerah Alshetwi </h3> 
+			<br>
+			<br>
+              
+        </div>
+    </footer>
+</body>
+
+</html>
