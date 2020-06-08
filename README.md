@@ -1,4 +1,4 @@
-# Movie library
+# Movies library
 
 
 For this project we used a movies dataset to classify a group of movies with four categories.
