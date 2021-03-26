@@ -11,5 +11,4 @@ And used **JavaScript** to simulate bubbles.
 When the curser moves over a bubble a brief information of the movie appear which are movie genre, name and rating. Additionally, if the user clicks on a specific bubble, The bubble becomes larger and contains the description of the movie.
 
 # Snapshots 
-
-![alt text](https://github.com/[ManalAlzeer]/[Movies-Library]/img/types.png?raw=true)
+![plot](./ManalAlzeer/Movies-Library/img/types.png)
