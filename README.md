@@ -14,3 +14,6 @@ When the curser moves over a bubble a brief information of the movie appear whic
 ![plot](ManalAlzeer/Movies-Library/blob/master/img/types.png)
 
 ![Alt text](ManalAlzeer/Movies-Library/blob/master/img/types.png?raw=true "Title")
+
+![alt text](https://github.com/ManalAlzeer/Movies-Library/blob/master/img/types.png?raw=true)
+
