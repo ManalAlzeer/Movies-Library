@@ -12,4 +12,4 @@ When the curser moves over a bubble a brief information of the movie appear whic
 
 # Snapshots 
 
-![alt text](https://github.com/[ManalAlzeer]/[Movies-Library]/blob/[master]/types.png?raw=true)
+![alt text](https://github.com/[ManalAlzeer]/[Movies-Library]/img/[master]/types.png?raw=true)
